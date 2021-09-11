@@ -10,7 +10,7 @@ $ cargo new --lib yew-timer && cd yew-timer
 
 ### wasmビルド
 ```sh
-$ wasm-pack build --target web --out-name wasm --out-dir ./static
+$ wasm-pack build --target web --out-name wasm --out-dir ./static/wasm
 ```
 
 ### ローカルサーバ起動

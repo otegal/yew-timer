@@ -1,0 +1,13 @@
+body {
+  background: #EEEEEE;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.contents {
+  display: flex;
+  flex-flow: column;
+}

@@ -44,10 +44,21 @@ impl Component for Model {
 
     fn view(&self) -> Html {
         html! {
-            <>
-                <button onclick=self.link.callback(|_| Msg::UpdateTime)> { "update time" } </button>
-                { &self.time }
-            </>
+            <div class="wrapper">
+                <div class="contents">
+                    <div class="time">
+                        { &self.time }
+                    </div>
+                    <div class="messages">
+                        { "ここにメッセージを何か表示する" }
+                    </div>
+                    <div class="buttons">
+                        <button onclick=self.link.callback(|_| Msg::UpdateTime)> { "update time" } </button>
+                        <button>{ "dummy btn 1" }</button>
+                        <button>{ "dummy btn 2" }</button>
+                    </div>
+                </div>
+            </div>
         }
     }
 }
