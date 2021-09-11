@@ -3,7 +3,6 @@ use std::panic;
 
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
-use chrono::Local;
 
 struct Model {
     link: ComponentLink<Self>,
@@ -13,8 +12,8 @@ struct Model {
 impl Model {
     fn current_time() -> String {
         panic::set_hook(Box::new(console_error_panic_hook::hook));
-        let date_time = Local::now();
-        date_time.format("%H:%M:%S").to_string()
+        let date = js_sys::Date::new_0();
+        String::from(date.to_locale_time_string("JP"))
     }
 }
 
@@ -28,7 +27,7 @@ impl Component for Model {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
             link,
-            time: "".to_string(),
+            time: Model::current_time(),
         }
     }
 
