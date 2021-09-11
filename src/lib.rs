@@ -1,13 +1,25 @@
+extern crate console_error_panic_hook;
+use std::panic;
+
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
+use chrono::Local;
 
 struct Model {
     link: ComponentLink<Self>,
-    value: i64,
+    time: String,
+}
+
+impl Model {
+    fn current_time() -> String {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
+        let date_time = Local::now();
+        date_time.format("%H:%M:%S").to_string()
+    }
 }
 
 enum Msg {
-    AddOne,
+    UpdateTime,
 }
 
 impl Component for Model {
@@ -16,30 +28,27 @@ impl Component for Model {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
             link,
-            value: 0,
+            time: "".to_string(),
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::AddOne => self.value += 1
+            Msg::UpdateTime => self.time = Model::current_time(),
         }
         true
     }
 
     fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        // Should only return "true" if new properties are different to
-        // previously received properties.
-        // This component has no properties so we will always return "false".
         false
     }
 
     fn view(&self) -> Html {
         html! {
-            <div>
-                <button onclick=self.link.callback(|_| Msg::AddOne)>{ "+1" }</button>
-                <p>{ self.value }</p>
-            </div>
+            <>
+                <button onclick=self.link.callback(|_| Msg::UpdateTime)> { "update time" } </button>
+                { &self.time }
+            </>
         }
     }
 }
