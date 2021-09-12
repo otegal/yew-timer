@@ -82,16 +82,16 @@ impl Component for Model {
         html! {
             <div class="wrapper">
                 <div class="contents">
-                    <div class="time">
-                        { &self.time }
-                    </div>
-                    <div class="messages">
-                        { "ここにメッセージを何か表示する" }
-                    </div>
                     <div class="buttons">
                         <button onclick=self.link.callback(|_| Msg::UpdateTime)> { "update time" } </button>
                         <button onclick=self.link.callback(|_| Msg::StartInterval)>{ "Start Interval" }</button>
                         <button onclick=self.link.callback(|_| Msg::Cancel)>{ "Cancel" }</button>
+                    </div>
+                    <div class="time">
+                        { &self.time }
+                    </div>
+                    <div class="messages">
+                        { for self.messages.iter().rev().map(|message| html! { <p>{ message }</p> }) }
                     </div>
                 </div>
             </div>

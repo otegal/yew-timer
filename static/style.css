@@ -11,3 +11,8 @@ body {
   display: flex;
   flex-flow: column;
 }
+
+.messages {
+  height: 400px;
+  overflow-y: scroll;
+}
