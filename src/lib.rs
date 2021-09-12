@@ -19,6 +19,11 @@ impl Model {
         let date = js_sys::Date::new_0();
         String::from(date.to_locale_time_string("JP"))
     }
+    fn current_time_with_suffix (suffix: &str) -> &'static str {
+        let now = Model::current_time();
+        let description = now + "\t" + suffix;
+        Box::leak(description.into_boxed_str())
+    }
 }
 
 enum Msg {
@@ -55,7 +60,7 @@ impl Component for Model {
                 self.messages.clear();
                 ConsoleService::clear();
 
-                self.messages.push("Timer started!");
+                self.messages.push(Model::current_time_with_suffix("Timeout started!"));
                 ConsoleService::time_named("Timer");
                 true
             }
@@ -69,18 +74,18 @@ impl Component for Model {
                 self.messages.clear();
                 ConsoleService::clear();
 
-                self.messages.push("Interval started!");
+                self.messages.push(Model::current_time_with_suffix("Interval started!"));
                 true
             }
             Msg::Cancel => {
                 self.job = None;
-                self.messages.push("Canceled!");
+                self.messages.push(Model::current_time_with_suffix("Cancelled!"));
                 ConsoleService::warn("Canceled");
                 true
             }
             Msg::Done => {
                 self.job = None;
-                self.messages.push("Done!");
+                self.messages.push(Model::current_time_with_suffix("Done!"));
 
                 ConsoleService::group();
                 ConsoleService::info("Done!");
@@ -89,7 +94,7 @@ impl Component for Model {
                 true
             }
             Msg::Tick => {
-                self.messages.push("Tick...");
+                self.time = Model::current_time();
                 ConsoleService::count_named("Tick");
                 true
             }
