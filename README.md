@@ -33,3 +33,8 @@ $ rustup show
 https://stackoverflow.com/questions/63210984/chrono-kills-my-rust-webassembly-function
 
 chronoを使うのをやめて、[js-sys](https://crates.io/crates/js-sys) で現在時刻を取得するようにして回避した
+
+### Stringを&'static strに変換する
+以下を見て解決。  
+いっつも引っかかってる気がする。
+https://stackoverflow.com/questions/23975391/how-to-convert-a-string-into-a-static-str
