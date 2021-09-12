@@ -1,44 +1,130 @@
+extern crate console_error_panic_hook;
+use std::panic;
+
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
+use yew::services::{IntervalService, ConsoleService, Task, TimeoutService};
+use std::time::Duration;
 
 struct Model {
     link: ComponentLink<Self>,
-    value: i64,
+    job: Option<Box<dyn Task>>,
+    time: String,
+    messages: Vec<&'static str>
+}
+
+impl Model {
+    fn current_time() -> String {
+        panic::set_hook(Box::new(console_error_panic_hook::hook));
+        let date = js_sys::Date::new_0();
+        String::from(date.to_locale_time_string("JP"))
+    }
+    fn current_time_with_suffix (suffix: &str) -> &'static str {
+        let now = Model::current_time();
+        let description = now + "\t" + suffix;
+        Box::leak(description.into_boxed_str())
+    }
 }
 
 enum Msg {
-    AddOne,
+    StartTimeout,
+    StartInterval,
+    Cancel,
+    Done,
+    Tick,
+    UpdateTime,
 }
 
 impl Component for Model {
     type Message = Msg;
     type Properties = ();
+
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
             link,
-            value: 0,
+            job: None,
+            time: Model::current_time(),
+            messages: Vec::new(),
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::AddOne => self.value += 1
+            Msg::StartTimeout => {
+                let handle = TimeoutService::spawn(
+                    Duration::from_secs(3),
+                    self.link.callback(|_| Msg::Done),
+                );
+                self.job = Some(Box::new(handle));
+
+                self.messages.clear();
+                ConsoleService::clear();
+
+                self.messages.push(Model::current_time_with_suffix("Timeout started!"));
+                ConsoleService::time_named("Timer");
+                true
+            }
+            Msg::StartInterval => {
+                let handle = IntervalService::spawn(
+                    Duration::from_secs(1),
+                    self.link.callback(|_| Msg::Tick),
+                );
+                self.job = Some(Box::new(handle));
+
+                self.messages.clear();
+                ConsoleService::clear();
+
+                self.messages.push(Model::current_time_with_suffix("Interval started!"));
+                true
+            }
+            Msg::Cancel => {
+                self.job = None;
+                self.messages.push(Model::current_time_with_suffix("Cancelled!"));
+                ConsoleService::warn("Canceled");
+                true
+            }
+            Msg::Done => {
+                self.job = None;
+                self.messages.push(Model::current_time_with_suffix("Done!"));
+
+                ConsoleService::group();
+                ConsoleService::info("Done!");
+                ConsoleService::time_named_end("Timer");
+                ConsoleService::group_end();
+                true
+            }
+            Msg::Tick => {
+                self.time = Model::current_time();
+                ConsoleService::count_named("Tick");
+                true
+            }
+            Msg::UpdateTime => {
+                self.time = Model::current_time();
+                true
+            }
         }
-        true
     }
 
     fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        // Should only return "true" if new properties are different to
-        // previously received properties.
-        // This component has no properties so we will always return "false".
         false
     }
 
     fn view(&self) -> Html {
         html! {
-            <div>
-                <button onclick=self.link.callback(|_| Msg::AddOne)>{ "+1" }</button>
-                <p>{ self.value }</p>
+            <div class="wrapper">
+                <div class="contents">
+                    <div class="time">
+                        { &self.time }
+                    </div>
+                    <div class="messages">
+                        { for self.messages.iter().rev().map(|message| html! { <p>{ message }</p> }) }
+                    </div>
+                    <div class="buttons">
+                        <button onclick=self.link.callback(|_| Msg::StartTimeout)> { "Start Timeout" } </button>
+                        <button onclick=self.link.callback(|_| Msg::StartInterval)>{ "Start Interval" }</button>
+                        <button onclick=self.link.callback(|_| Msg::Cancel)>{ "Cancel" }</button>
+                    </div>
+                </div>
             </div>
         }
     }
