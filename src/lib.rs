@@ -3,7 +3,7 @@ use std::panic;
 
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
-use yew::services::{IntervalService, ConsoleService, Task};
+use yew::services::{IntervalService, ConsoleService, Task, TimeoutService};
 use std::time::Duration;
 
 struct Model {
@@ -22,8 +22,10 @@ impl Model {
 }
 
 enum Msg {
+    StartTimeout,
     StartInterval,
     Cancel,
+    Done,
     Tick,
     UpdateTime,
 }
@@ -43,6 +45,20 @@ impl Component for Model {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
+            Msg::StartTimeout => {
+                let handle = TimeoutService::spawn(
+                    Duration::from_secs(3),
+                    self.link.callback(|_| Msg::Done),
+                );
+                self.job = Some(Box::new(handle));
+
+                self.messages.clear();
+                ConsoleService::clear();
+
+                self.messages.push("Timer started!");
+                ConsoleService::time_named("Timer");
+                true
+            }
             Msg::StartInterval => {
                 let handle = IntervalService::spawn(
                     Duration::from_secs(1),
@@ -55,18 +71,28 @@ impl Component for Model {
 
                 self.messages.push("Interval started!");
                 true
-            },
+            }
             Msg::Cancel => {
                 self.job = None;
                 self.messages.push("Canceled!");
                 ConsoleService::warn("Canceled");
                 true
-            },
+            }
+            Msg::Done => {
+                self.job = None;
+                self.messages.push("Done!");
+
+                ConsoleService::group();
+                ConsoleService::info("Done!");
+                ConsoleService::time_named_end("Timer");
+                ConsoleService::group_end();
+                true
+            }
             Msg::Tick => {
                 self.messages.push("Tick...");
                 ConsoleService::count_named("Tick");
                 true
-            },
+            }
             Msg::UpdateTime => {
                 self.time = Model::current_time();
                 true
@@ -83,7 +109,7 @@ impl Component for Model {
             <div class="wrapper">
                 <div class="contents">
                     <div class="buttons">
-                        <button onclick=self.link.callback(|_| Msg::UpdateTime)> { "update time" } </button>
+                        <button onclick=self.link.callback(|_| Msg::StartTimeout)> { "Start Timeout" } </button>
                         <button onclick=self.link.callback(|_| Msg::StartInterval)>{ "Start Interval" }</button>
                         <button onclick=self.link.callback(|_| Msg::Cancel)>{ "Cancel" }</button>
                     </div>
