@@ -1,5 +1,5 @@
 body {
-  background: #EEEEEE;
+  background: #303846;
 }
 
 .wrapper {
@@ -10,9 +10,35 @@ body {
 .contents {
   display: flex;
   flex-flow: column;
+  margin: 10em;
+}
+
+.time {
+  color: #25c2a0;
+  text-align: center;
+  font-size: 6em;
 }
 
 .messages {
-  height: 400px;
-  overflow-y: scroll;
+  height: 5em;
+  overflow: hidden;
+  border: 0.1em dashed #F5F6F7;
+}
+
+.messages > p {
+  color: #F5F6F7;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2em;
+}
+
+.buttons > button {
+  border: none;
+  border-radius: 0.5rem;
+  letter-spacing: 0.1em;
+  padding: 12px;
+  line-height: 1.5;
 }

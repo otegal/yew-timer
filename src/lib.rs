@@ -113,16 +113,16 @@ impl Component for Model {
         html! {
             <div class="wrapper">
                 <div class="contents">
-                    <div class="buttons">
-                        <button onclick=self.link.callback(|_| Msg::StartTimeout)> { "Start Timeout" } </button>
-                        <button onclick=self.link.callback(|_| Msg::StartInterval)>{ "Start Interval" }</button>
-                        <button onclick=self.link.callback(|_| Msg::Cancel)>{ "Cancel" }</button>
-                    </div>
                     <div class="time">
                         { &self.time }
                     </div>
                     <div class="messages">
                         { for self.messages.iter().rev().map(|message| html! { <p>{ message }</p> }) }
+                    </div>
+                    <div class="buttons">
+                        <button onclick=self.link.callback(|_| Msg::StartTimeout)> { "Start Timeout" } </button>
+                        <button onclick=self.link.callback(|_| Msg::StartInterval)>{ "Start Interval" }</button>
+                        <button onclick=self.link.callback(|_| Msg::Cancel)>{ "Cancel" }</button>
                     </div>
                 </div>
             </div>
